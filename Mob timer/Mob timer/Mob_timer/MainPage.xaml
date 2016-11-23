@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Mob_timer"
+             x:Class="Mob_timer.MainPage">
+
+  <StackLayout VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand"
+                     Orientation="Vertical"
+                     Spacing="15">
+    <Entry Placeholder="name" x:Name="TeamMemberEntry"></Entry>
+    <Button Text="Add member" Clicked="AddMember"></Button>
+
+    <Button Text="START"
+            Clicked="StartMobSession"
+            VerticalOptions="Start"></Button>
+
+    <Button Text="STOP"
+            Clicked="StopMobSession"
+            VerticalOptions="Start"
+            IsEnabled="False"></Button>
+
+    <Label Text="Mob timer"
+             VerticalOptions="End"
+             HorizontalOptions="Center" />
+
+    <Label Text="By mpetit"
+             VerticalOptions="End"
+             HorizontalOptions="Center" />
+  </StackLayout>
+
+</ContentPage>

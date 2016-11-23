@@ -10,21 +10,37 @@
                      Spacing="15">
     <Entry Placeholder="name" x:Name="TeamMemberEntry"></Entry>
     <Button Text="Add member" Clicked="AddMember"></Button>
-
-    <Button Text="START"
+    <Entry Placeholder="Driver switch interval (minutes)" x:Name="DriverSwitchInterval" Text="7"></Entry>
+    <Button x:Name="StartButton"
+            Text="START"
             Clicked="StartMobSession"
             VerticalOptions="Start"></Button>
 
-    <Button Text="STOP"
+    <Button x:Name="StopButton"
+            Text="STOP"
             Clicked="StopMobSession"
             VerticalOptions="Start"
             IsEnabled="False"></Button>
 
-    <Label Text="Mob timer"
-             VerticalOptions="End"
-             HorizontalOptions="Center" />
+    <ListView x:Name="TeamMemberList">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <ViewCell>
+            <ViewCell.ContextActions>
+              <MenuItem Clicked="OnAbsent" CommandParameter="{Binding Name}"
+                 Text="More" />
+              <MenuItem Clicked="OnDelete" CommandParameter="{Binding .}"
+                 Text="Delete" IsDestructive="True" />
+            </ViewCell.ContextActions>
+            <StackLayout Padding="15,0">
+              <Label Text="{Binding Name}" />
+            </StackLayout>
+          </ViewCell>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
 
-    <Label Text="By mpetit"
+    <Label Text="Mob timer - by mpetit"
              VerticalOptions="End"
              HorizontalOptions="Center" />
   </StackLayout>

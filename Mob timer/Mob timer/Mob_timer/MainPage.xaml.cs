@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -12,31 +13,58 @@ namespace Mob_timer
 {
     public partial class MainPage : ContentPage
     {
-        private int _intervalInMinutes = 1;
         private int _currentDriver = -1;
-        private List<string> _drivers = new List<string>();
+        ObservableCollection<Driver> _drivers = new ObservableCollection<Driver>();
         private bool _sessionStoped = true;
 
         public MainPage()
         {
             InitializeComponent();
+            TeamMemberList.ItemsSource = _drivers;
         }
 
         private void AddMember(object sender, EventArgs e)
         {
-            _drivers.Add(TeamMemberEntry.Text);
+            string name = TeamMemberEntry.Text;
+            if (name.Length > 0)
+            {
+                _drivers.Add(new Driver(name));
+            }
+            TeamMemberEntry.Text = "";
+            TeamMemberEntry.Focus();
         }
 
         private void StartMobSession(object sender, EventArgs e)
         {
+            if (_drivers.Count == 0)
+            {
+                DisplayAlert("Something's wrong!", "This team has no members?", "Let me check");
+                return;
+            }
             _sessionStoped = false;
             _currentDriver = 0;
             StartTimer();
+            StartButton.IsEnabled = false;
+            StopButton.IsEnabled = true;
         }
 
         private void StopMobSession(object sender, EventArgs e)
         {
             _sessionStoped = true;
+            StartButton.IsEnabled = true;
+            StopButton.IsEnabled = false;
+        }
+
+        private void OnAbsent(object sender, EventArgs e)
+        {
+            var mi = ((MenuItem)sender);
+            Debug.WriteLine(mi.CommandParameter);
+        }
+
+        private void OnDelete(object sender, EventArgs e)
+        {
+            var mi = ((MenuItem)sender);
+            Debug.WriteLine(mi.CommandParameter);
         }
 
         private bool ShowSwitchDriverMessase()
@@ -45,11 +73,11 @@ namespace Mob_timer
             {
                 return false;
             }
-            CrossLocalNotifications.Current.Show("Time to switch!", "Next driver should be " + NextDriver());
+            CrossLocalNotifications.Current.Show("Time to switch!", "Next driver should be " + NextDriver().Name);
             return true;
         }
 
-        private string NextDriver()
+        private Driver NextDriver()
         {
             int nextDriver = _currentDriver++%_drivers.Count;
             return _drivers[nextDriver];
@@ -60,19 +88,25 @@ namespace Mob_timer
 #if DEBUG
             Device.StartTimer(new TimeSpan(0, 0, 0, 15, 0), ShowSwitchDriverMessase);
             _currentDriver = 0;
-            _drivers.Add("D 1");
-            _drivers.Add("D 2");
-            _drivers.Add("D 3");
-#else
-            Device.StartTimer(new TimeSpan(0, 0, _intervalInMinutes, 0, 0), ShowSwitchDriverMessase);
-           
             if (_drivers.Count == 0)
             {
-                DisplayAlert("Something's wrong!", "This team has no members?", "Let me check");
-
+                _drivers.Add(new Driver("D 1"));
+                _drivers.Add(new Driver("D 2"));
+                _drivers.Add(new Driver("D 3"));
             }
+#else
+            Device.StartTimer(new TimeSpan(0, 0, Convert.ToInt32(DriverSwitchInterval.Text), 0, 0), ShowSwitchDriverMessase);
 #endif
-            ShowSwitchDriverMessase();
+            CrossLocalNotifications.Current.Show("Session started", NextDriver().Name + ", you got " + DriverSwitchInterval.Text + " minutes");
         }
+    }
+
+    class Driver
+    {
+        public Driver(string name)
+        {
+            Name = name;
+        }
+        public string Name { set; get; }
     }
 }
